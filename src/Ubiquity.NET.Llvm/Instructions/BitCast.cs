@@ -1,19 +1,20 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="BitCast.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm.Instructions
 {
-    /// <summary>This class represents a no-op cast from one type to another</summary>
+    /// <summary>This class represents a no-op cast from one type to another.</summary>
     public class BitCast
         : Cast
     {
-        internal BitCast( LLVMValueRef valueRef )
-            : base( valueRef )
+        internal BitCast(LLVMValueRef valueRef)
+            : base(valueRef)
         {
         }
     }

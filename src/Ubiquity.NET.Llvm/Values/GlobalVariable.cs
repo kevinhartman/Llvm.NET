@@ -1,72 +1,72 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="GlobalVariable.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
 using System.Diagnostics.CodeAnalysis;
 
-using Ubiquity.ArgValidators;
-using Ubiquity.NET.Llvm.DebugInfo;
-using Ubiquity.NET.Llvm.Interop;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm.Values
 {
-    /// <summary>An LLVM Global Variable</summary>
+    /// <summary>An LLVM Global Variable.</summary>
     public class GlobalVariable
         : GlobalObject
     {
-        /// <summary>Gets or sets a value indicating whether this variable is initialized in an external module</summary>
+        internal GlobalVariable(LLVMValueRef valueRef)
+            : base(valueRef)
+        {
+        }
+
+        /// <summary>Gets or sets a value indicating whether this variable is initialized in an external module.</summary>
         public bool IsExternallyInitialized
         {
-            get => LLVMIsExternallyInitialized( ValueHandle );
-            set => LLVMSetExternallyInitialized( ValueHandle, value );
+            get => this.ValueHandle.IsExternallyInitialized;
+            set
+            {
+                var val = this.ValueHandle;
+                val.IsExternallyInitialized = value;
+            }
         }
 
-        /// <summary>Gets or sets a value indicating whether this global is a Constant</summary>
+        /// <summary>Gets or sets a value indicating whether this global is a Constant.</summary>
         public bool IsConstant
         {
-            get => LLVMIsGlobalConstant( ValueHandle );
-            set => LLVMSetGlobalConstant( ValueHandle, value );
+            get => this.ValueHandle.IsGlobalConstant;
+            set
+            {
+                var val = this.ValueHandle;
+                val.IsGlobalConstant = value;
+            }
         }
 
-        /// <summary>Gets or sets a value indicating whether this global is stored per thread</summary>
+        /// <summary>Gets or sets a value indicating whether this global is stored per thread.</summary>
         public bool IsThreadLocal
         {
-            get => LLVMIsThreadLocal( ValueHandle );
-            set => LLVMSetThreadLocal( ValueHandle, value );
+            get => this.ValueHandle.IsThreadLocal;
+            set
+            {
+                var val = this.ValueHandle;
+                val.IsThreadLocal = value;
+            }
         }
 
-        /// <summary>Gets or sets the initial value for the variable</summary>
+        /// <summary>Gets or sets the initial value for the variable.</summary>
         public Constant? Initializer
         {
             get
             {
-                var handle = LLVMGetInitializer( ValueHandle );
-                return handle == default ? null : FromHandle<Constant>( handle );
+                var handle = this.ValueHandle.Initializer;
+                return handle == default ? default : FromHandle<Constant>(handle);
             }
 
-            set => LLVMSetInitializer( ValueHandle, value?.ValueHandle ?? LLVMValueRef.Zero );
-        }
-
-        /// <summary>Adds a <see cref="DIGlobalVariableExpression"/> for a <see cref="GlobalVariable"/></summary>
-        /// <param name="expression">Expression to add</param>
-        [SuppressMessage( "Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "Specific type required by interop" )]
-        public void AddDebugInfo( DIGlobalVariableExpression expression )
-        {
-            expression.ValidateNotNull( nameof( expression ) );
-
-            LibLLVMGlobalVariableAddDebugExpression( ValueHandle, expression.MetadataHandle );
-        }
-
-        /// <summary>Removes the value from its parent module, but does not delete it</summary>
-        public void RemoveFromParent( ) => LibLLVMRemoveGlobalFromParent( ValueHandle );
-
-        internal GlobalVariable( LLVMValueRef valueRef )
-            : base( valueRef )
-        {
+            set
+            {
+                var val = this.ValueHandle;
+                val.Initializer = value?.ValueHandle ?? default;
+            }
         }
     }
 }

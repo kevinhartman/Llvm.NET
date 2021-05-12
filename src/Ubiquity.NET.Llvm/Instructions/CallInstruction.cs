@@ -1,106 +1,105 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="CallInstruction.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using Ubiquity.ArgValidators;
-using Ubiquity.NET.Llvm.Interop;
-using Ubiquity.NET.Llvm.Properties;
+using LLVMSharp.Interop;
 using Ubiquity.NET.Llvm.Values;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
 
 namespace Ubiquity.NET.Llvm.Instructions
 {
-    /// <summary>Call instruction</summary>
+    /// <summary>Call instruction.</summary>
     /// <seealso href="xref:llvm_langref#call-instruction"/>
     public class CallInstruction
-        : Instruction
-        , IAttributeAccessor
+        : Instruction,
+        IAttributeAccessor
     {
-        /// <summary>Gets the target function of the call</summary>
-        public IrFunction TargetFunction
-            => FromHandle<IrFunction>( LLVMGetCalledValue( ValueHandle ).ThrowIfInvalid( ) )!;
-
-        /// <summary>Gets or sets a value indicating whether the call is a tail call</summary>
-        public bool IsTailCall
+        internal CallInstruction(LLVMValueRef valueRef)
+            : base(valueRef)
         {
-            get => LLVMIsTailCall( ValueHandle );
-            set => LLVMSetTailCall( ValueHandle, value );
+            this.Attributes = new ValueAttributeDictionary(this, () => this.TargetFunction);
         }
 
-        /// <summary>Gets the attributes for this call site</summary>
+        /// <summary>Gets the target function of the call.</summary>
+        public unsafe IrFunction TargetFunction
+            => FromHandle<IrFunction>(LLVM.GetCalledValue(this.ValueHandle))!;
+
+        /// <summary>Gets or sets a value indicating whether the call is a tail call.</summary>
+        public unsafe bool IsTailCall
+        {
+            get => this.ValueHandle.IsTailCall;
+            set => LLVM.SetTailCall(this.ValueHandle, value ? 1 : 0);
+        }
+
+        /// <summary>Gets the attributes for this call site.</summary>
         public IAttributeDictionary Attributes { get; }
 
         /// <inheritdoc/>
-        public void AddAttributeAtIndex( FunctionAttributeIndex index, AttributeValue attrib )
+        public unsafe void AddAttributeAtIndex(FunctionAttributeIndex index, AttributeValue attrib)
         {
-            attrib.VerifyValidOn( index, this );
-            LLVMAddCallSiteAttribute( ValueHandle, ( LLVMAttributeIndex )index, attrib.NativeAttribute );
+            attrib.VerifyValidOn(index, this);
+            LLVM.AddCallSiteAttribute(this.ValueHandle, (uint)index, attrib.NativeAttribute);
         }
 
         /// <inheritdoc/>
-        public uint GetAttributeCountAtIndex( FunctionAttributeIndex index )
+        public uint GetAttributeCountAtIndex(FunctionAttributeIndex index)
         {
-            return LLVMGetCallSiteAttributeCount( ValueHandle, ( LLVMAttributeIndex )index );
+            return this.ValueHandle.GetCallSiteAttributeCount((LLVMAttributeIndex)index);
         }
 
         /// <inheritdoc/>
-        public IEnumerable<AttributeValue> GetAttributesAtIndex( FunctionAttributeIndex index )
+        public IEnumerable<AttributeValue> GetAttributesAtIndex(FunctionAttributeIndex index)
         {
-            uint count = GetAttributeCountAtIndex( index );
-            if( count == 0 )
+            uint count = this.GetAttributeCountAtIndex(index);
+            if (count == 0)
             {
-                return Enumerable.Empty<AttributeValue>( );
+                return Enumerable.Empty<AttributeValue>();
             }
 
-            var buffer = new LLVMAttributeRef[ count ];
-            LLVMGetCallSiteAttributes( ValueHandle, ( LLVMAttributeIndex )index, buffer );
+            var buffer = this.ValueHandle.GetCallSiteAttributes((LLVMAttributeIndex)index);
             return from attribRef in buffer
-                   select AttributeValue.FromHandle( Context, attribRef );
+                   select AttributeValue.FromHandle(this.Context, attribRef);
         }
 
         /// <inheritdoc/>
-        public AttributeValue GetAttributeAtIndex( FunctionAttributeIndex index, AttributeKind kind )
+        public unsafe AttributeValue GetAttributeAtIndex(FunctionAttributeIndex index, AttributeKind kind)
         {
-            var handle = LLVMGetCallSiteEnumAttribute( ValueHandle, ( LLVMAttributeIndex )index, kind.GetEnumAttributeId( ) );
-            return AttributeValue.FromHandle( Context, handle );
+            var handle = LLVM.GetCallSiteEnumAttribute(this.ValueHandle, (uint)index, kind.GetEnumAttributeId());
+            return AttributeValue.FromHandle(this.Context, handle);
         }
 
         /// <inheritdoc/>
-        public AttributeValue GetAttributeAtIndex( FunctionAttributeIndex index, string name )
+        public unsafe AttributeValue GetAttributeAtIndex(FunctionAttributeIndex index, string name)
         {
-            if( string.IsNullOrWhiteSpace( name ) )
+            if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentException( Resources.Name_cannot_be_null_or_empty, nameof( name ) );
+                throw new ArgumentException();
             }
 
-            var handle = LLVMGetCallSiteStringAttribute( ValueHandle, ( LLVMAttributeIndex )index, name, ( uint )name.Length );
-            return AttributeValue.FromHandle( Context, handle );
+            var handle = LLVM.GetCallSiteStringAttribute(this.ValueHandle, (uint)index, name.AsMarshaledString(), (uint)name.Length);
+            return AttributeValue.FromHandle(this.Context, handle);
         }
 
         /// <inheritdoc/>
-        public void RemoveAttributeAtIndex( FunctionAttributeIndex index, AttributeKind kind )
+        public unsafe void RemoveAttributeAtIndex(FunctionAttributeIndex index, AttributeKind kind)
         {
-            LLVMRemoveCallSiteEnumAttribute( ValueHandle, ( LLVMAttributeIndex )index, kind.GetEnumAttributeId( ) );
+            LLVM.RemoveCallSiteEnumAttribute(this.ValueHandle, (uint)index, kind.GetEnumAttributeId());
         }
 
         /// <inheritdoc/>
-        public void RemoveAttributeAtIndex( FunctionAttributeIndex index, string name )
+        public unsafe void RemoveAttributeAtIndex(FunctionAttributeIndex index, string name)
         {
-            name.ValidateNotNullOrWhiteSpace( nameof( name ) );
-            LLVMRemoveCallSiteStringAttribute( ValueHandle, ( LLVMAttributeIndex )index, name, ( uint )name.Length );
-        }
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
 
-        internal CallInstruction( LLVMValueRef valueRef )
-            : base( valueRef )
-        {
-            Attributes = new ValueAttributeDictionary( this, ( ) => TargetFunction );
+            LLVM.RemoveCallSiteStringAttribute(this.ValueHandle, (uint)index, name.AsMarshaledString(), (uint)name.Length);
         }
     }
 }

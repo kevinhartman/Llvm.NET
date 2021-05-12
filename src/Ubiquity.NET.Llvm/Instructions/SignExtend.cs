@@ -1,19 +1,20 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="SignExtend.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm.Instructions
 {
-    /// <summary>Sign extension instruction</summary>
+    /// <summary>Sign extension instruction.</summary>
     public class SignExtend
         : Cast
     {
-        internal SignExtend( LLVMValueRef valueRef )
-            : base( valueRef )
+        internal SignExtend(LLVMValueRef valueRef)
+            : base(valueRef)
         {
         }
     }

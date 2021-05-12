@@ -1,73 +1,65 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Constant.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
 using System;
-
-using Ubiquity.NET.Llvm.Interop;
-using Ubiquity.NET.Llvm.Properties;
+using LLVMSharp.Interop;
 using Ubiquity.NET.Llvm.Types;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
 
 namespace Ubiquity.NET.Llvm.Values
 {
-    /// <summary>Contains an LLVM Constant value</summary>
-    public class Constant
+    /// <summary>Contains an LLVM Constant value.</summary>
+    public unsafe class Constant
         : User
     {
-        /// <summary>Gets a value indicating whether the constant is a Zero value for the its type</summary>
-        public bool IsZeroValue => LibLLVMIsConstantZeroValue( ValueHandle );
-
-        /// <summary>Create a NULL pointer for a given type</summary>
-        /// <param name="typeRef">Type of pointer to create a null vale for</param>
-        /// <returns>Constant NULL pointer of the specified type</returns>
-        public static Constant NullValueFor( ITypeRef typeRef )
+        internal Constant(LLVMValueRef valueRef)
+            : base(valueRef)
         {
-            if( typeRef == null )
+        }
+
+        /// <summary>Gets a value indicating whether the constant is a Zero value for the its type.</summary>
+        public bool IsZeroValue => this.ValueHandle.IsAConstantAggregateZero != default;
+
+        /// <summary>Create a NULL pointer for a given type.</summary>
+        /// <param name="typeRef">Type of pointer to create a null vale for.</param>
+        /// <returns>Constant NULL pointer of the specified type.</returns>
+        public static Constant NullValueFor(ITypeRef typeRef)
+        {
+            if (typeRef == default)
             {
-                throw new ArgumentNullException( nameof( typeRef ) );
+                throw new ArgumentNullException(nameof(typeRef));
             }
 
             var kind = typeRef.Kind;
-            if( kind == TypeKind.Label || kind == TypeKind.Function || ( typeRef is StructType structType && structType.IsOpaque ) )
+            if (kind == TypeKind.Label || kind == TypeKind.Function || (typeRef is StructType structType && structType.IsOpaque))
             {
-                throw new ArgumentException( Resources.Cannot_get_null_for_labels_and_opaque_types );
+                throw new ArgumentException();
             }
 
-            return FromHandle<Constant>( LLVMConstNull( typeRef.GetTypeRef( ) ).ThrowIfInvalid( ) )!;
+            return FromHandle<Constant>(LLVM.ConstNull(typeRef.GetTypeRef()))!;
         }
 
-        /// <summary>Gets the constant as a Metadata node</summary>
-        /// <returns>Constant value as a metadata constant</returns>
-        public ConstantAsMetadata ToMetadata( )
-            => LlvmMetadata.FromHandle<ConstantAsMetadata>( Context, LibLLVMConstantAsMetadata( ValueHandle ).ThrowIfInvalid( ) )!;
+        /// <summary>Creates a constant instance of <paramref name="typeRef"/> with all bits in the instance set to 1.</summary>
+        /// <param name="typeRef">Type of value to create.</param>
+        /// <returns>Constant for the type with all instance bits set to 1.</returns>
+        public static Constant AllOnesValueFor(ITypeRef typeRef)
+            => FromHandle<Constant>(LLVM.ConstAllOnes(typeRef.GetTypeRef()))!;
 
-        /// <summary>Creates a constant instance of <paramref name="typeRef"/> with all bits in the instance set to 1</summary>
-        /// <param name="typeRef">Type of value to create</param>
-        /// <returns>Constant for the type with all instance bits set to 1</returns>
-        public static Constant AllOnesValueFor( ITypeRef typeRef )
-            => FromHandle<Constant>( LLVMConstAllOnes( typeRef.GetTypeRef( ) ).ThrowIfInvalid( ) )!;
-
-        /// <summary>Creates an <see cref="Constant"/> representing an undefined value for <paramref name="typeRef"/></summary>
-        /// <param name="typeRef">Type to create the undefined value for</param>
+        /// <summary>Creates an <see cref="Constant"/> representing an undefined value for <paramref name="typeRef"/>.</summary>
+        /// <param name="typeRef">Type to create the undefined value for.</param>
         /// <returns>
-        /// <see cref="Constant"/> representing an undefined value of <paramref name="typeRef"/>
+        /// <see cref="Constant"/> representing an undefined value of <paramref name="typeRef"/>.
         /// </returns>
-        public static Constant UndefinedValueFor( ITypeRef typeRef )
-            => FromHandle<Constant>( LLVMGetUndef( typeRef.GetTypeRef( ) ).ThrowIfInvalid( ) )!;
+        public static Constant UndefinedValueFor(ITypeRef typeRef)
+            => FromHandle<Constant>(LLVM.GetUndef(typeRef.GetTypeRef()))!;
 
-        /// <summary>Create a constant NULL pointer for a given type</summary>
-        /// <param name="typeRef">Type of pointer to create a null value for</param>
-        /// <returns>Constant NULL pointer of the specified type</returns>
-        public static Constant ConstPointerToNullFor( ITypeRef typeRef )
-            => FromHandle<Constant>( LLVMConstPointerNull( typeRef.GetTypeRef( ) ).ThrowIfInvalid( ) )!;
-
-        internal Constant( LLVMValueRef valueRef )
-            : base( valueRef )
-        {
-        }
+        /// <summary>Create a constant NULL pointer for a given type.</summary>
+        /// <param name="typeRef">Type of pointer to create a null value for.</param>
+        /// <returns>Constant NULL pointer of the specified type.</returns>
+        public static Constant ConstPointerToNullFor(ITypeRef typeRef)
+            => FromHandle<Constant>(LLVM.ConstPointerNull(typeRef.GetTypeRef()))!;
     }
 }

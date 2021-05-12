@@ -1,47 +1,44 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="ArrayType.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
 using System;
-
-using Ubiquity.NET.Llvm.Interop;
-using Ubiquity.NET.Llvm.Properties;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
+using LLVMSharp.Interop;
 
 // Interface+internal type matches file name
 #pragma warning disable SA1649
 
 namespace Ubiquity.NET.Llvm.Types
 {
-    /// <summary>Interface for an LLVM array type </summary>
+    /// <summary>Interface for an LLVM array type. </summary>
     public interface IArrayType
         : ISequenceType
     {
-        /// <summary>Gets the length of the array</summary>
+        /// <summary>Gets the length of the array.</summary>
         uint Length { get; }
     }
 
-    /// <summary>Array type definition</summary>
+    /// <summary>Array type definition.</summary>
     /// <remarks>
-    /// Array's in LLVM are fixed length sequences of elements
+    /// Array's in LLVM are fixed length sequences of elements.
     /// </remarks>
     internal class ArrayType
-        : SequenceType
-        , IArrayType
+        : SequenceType,
+        IArrayType
     {
-        /// <inheritdoc/>
-        public uint Length => LLVMGetArrayLength( TypeRefHandle );
-
-        internal ArrayType( LLVMTypeRef typeRef )
-            : base( typeRef )
+        internal ArrayType(LLVMTypeRef typeRef)
+            : base(typeRef)
         {
-            if( LLVMGetTypeKind( typeRef ) != LLVMTypeKind.LLVMArrayTypeKind )
+            if (typeRef.Kind != LLVMTypeKind.LLVMArrayTypeKind)
             {
-                throw new ArgumentException( Resources.Array_type_reference_expected, nameof( typeRef ) );
+                throw new ArgumentException();
             }
         }
+
+        /// <inheritdoc/>
+        public uint Length => this.TypeRefHandle.ArrayLength;
     }
 }

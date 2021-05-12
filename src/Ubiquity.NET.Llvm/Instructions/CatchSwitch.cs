@@ -1,75 +1,49 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="CatchSwitch.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
+using LLVMSharp.Interop;
 
-using Ubiquity.ArgValidators;
-using Ubiquity.NET.Llvm.Interop;
-using Ubiquity.NET.Llvm.Properties;
 using Ubiquity.NET.Llvm.Values;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
 
 namespace Ubiquity.NET.Llvm.Instructions
 {
     /// <summary>Describes the set of possible catch handlers that may be executed by an
-    /// <see href="xref:llvm_langref#personalityfn">EH personality routine</see></summary>
+    /// <see href="xref:llvm_langref#personalityfn">EH personality routine</see>.</summary>
     /// <seealso href="xref:llvm_langref#i-catchswitch">LLVM catchswitch instruction</seealso>
     /// <seealso href="xref:llvm_exception_handling#exception-handling-in-llvm">Exception Handling in LLVM</seealso>
     /// <seealso href="xref:llvm_exception_handling#wineh">Exception Handling using the Windows Runtime</seealso>
     public class CatchSwitch
         : Instruction
     {
-        /// <summary>Gets or sets the Parent pad for this <see cref="CatchSwitch"/></summary>
-        public Value ParentPad
+        internal CatchSwitch(LLVMValueRef valueRef)
+            : base(valueRef)
         {
-            get => Operands.GetOperand<Value>( 0 )!;
-            set => Operands[ 0 ] = value.ValidateNotNull( nameof(value) );
         }
 
-        /// <summary>Gets a value indicating whether this <see cref="CatchSwitch"/> has an unwind destination</summary>
-        public bool HasUnwindDestination => LibLLVMHasUnwindDest( ValueHandle );
+        /// <summary>Gets or sets the Parent pad for this <see cref="CatchSwitch"/>.</summary>
+        public Value ParentPad
+        {
+            get => this.Operands.GetOperand<Value>(0)!;
+            set => this.Operands[0] = value;
+        }
 
-        /// <summary>Gets a value indicating whether this <see cref="CatchSwitch"/> unwinds to the caller</summary>
-        public bool UnwindsToCaller => !HasUnwindDestination;
-
-        /// <summary>Gets or sets the Unwind destination for this <see cref="CatchSwitch"/></summary>
-        /// <remarks>
-        /// While retrieving the destination may return null, setting with null will generate
-        /// an exception. In particular if <see cref="HasUnwindDestination"/> is <see langword="false"/>
-        /// then the UnwindDestination is <see langword="null"/>.
-        /// </remarks>
-        public BasicBlock? UnwindDestination
+        /// <summary>Gets or sets the Unwind destination for this <see cref="CatchSwitch"/>.</summary>
+        public unsafe BasicBlock? UnwindDestination
         {
             get
             {
-                if( !HasUnwindDestination )
-                {
-                    return null;
-                }
-
-                var handle = LLVMGetUnwindDest( ValueHandle );
-                return handle == default ? null : BasicBlock.FromHandle( handle );
+                var handle = LLVM.GetUnwindDest(this.ValueHandle);
+                return handle == default ? default : BasicBlock.FromHandle(handle);
             }
 
             set
             {
-                value.ValidateNotNull( nameof( value ) );
-                if(!HasUnwindDestination)
-                {
-                    throw new InvalidOperationException( Resources.Cannot_set_unwindDestination_for_instruction_that_unwinds_to_caller );
-                }
-
-                LLVMSetUnwindDest( ValueHandle, value!.BlockHandle );
+                LLVM.SetUnwindDest(this.ValueHandle, value!.BlockHandle);
             }
-        }
-
-        internal CatchSwitch( LLVMValueRef valueRef )
-            : base( valueRef )
-        {
         }
     }
 }

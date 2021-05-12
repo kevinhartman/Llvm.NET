@@ -1,6 +1,7 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="IHandleInterning.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -18,10 +19,10 @@ namespace Ubiquity.NET.Llvm
     {
         Context Context { get; }
 
-        TMappedType GetOrCreateItem( THandle handle, Action<THandle>? foundHandleRelease = null );
+        TMappedType GetOrCreateItem(THandle handle, Action<THandle>? foundHandleRelease = default);
 
-        void Remove( THandle handle );
+        void Remove(THandle handle);
 
-        void Clear( );
+        void Clear();
     }
 }

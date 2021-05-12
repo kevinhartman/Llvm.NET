@@ -1,19 +1,20 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="SelectInstruction.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm.Instructions
 {
-    /// <summary>Select instruction</summary>
+    /// <summary>Select instruction.</summary>
     public class SelectInstruction
         : Instruction
     {
-        internal SelectInstruction( LLVMValueRef valueRef )
-            : base( valueRef )
+        internal SelectInstruction(LLVMValueRef valueRef)
+            : base(valueRef)
         {
         }
     }

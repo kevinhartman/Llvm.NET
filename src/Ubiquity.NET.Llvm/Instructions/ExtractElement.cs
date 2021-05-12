@@ -1,10 +1,11 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="ExtractElement.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm.Instructions
 {
@@ -13,8 +14,8 @@ namespace Ubiquity.NET.Llvm.Instructions
     public class ExtractElement
         : Instruction
     {
-        internal ExtractElement( LLVMValueRef valueRef )
-            : base( valueRef )
+        internal ExtractElement(LLVMValueRef valueRef)
+            : base(valueRef)
         {
         }
     }

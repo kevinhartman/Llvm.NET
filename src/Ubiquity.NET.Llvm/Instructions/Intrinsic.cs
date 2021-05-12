@@ -1,34 +1,31 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Intrinsic.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
 using System;
 
-using Ubiquity.ArgValidators;
-using Ubiquity.NET.Llvm.Interop;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm.Instructions
 {
-    /// <summary>base class for calls to LLVM intrinsic functions</summary>
+    /// <summary>base class for calls to LLVM intrinsic functions.</summary>
     public class Intrinsic
         : CallInstruction
     {
-        /// <summary>Looks up the LLVM intrinsic ID from it's name</summary>
-        /// <param name="name">Name of the intrinsic</param>
-        /// <returns>Intrinsic ID or 0 if the name does not correspond with an intrinsic function</returns>
-        public static UInt32 LookupId( string name )
+        internal Intrinsic(LLVMValueRef valueRef)
+            : base(valueRef)
         {
-            name.ValidateNotNullOrWhiteSpace( nameof( name ) );
-            return LLVMLookupIntrinsicID( name, name.Length );
         }
 
-        internal Intrinsic( LLVMValueRef valueRef )
-            : base( valueRef )
+        /// <summary>Looks up the LLVM intrinsic ID from it's name.</summary>
+        /// <param name="name">Name of the intrinsic.</param>
+        /// <returns>Intrinsic ID or 0 if the name does not correspond with an intrinsic function.</returns>
+        public static unsafe uint LookupId(string name)
         {
+            return LLVM.LookupIntrinsicID(name.AsMarshaledString(), (UIntPtr)name.Length);
         }
     }
 }

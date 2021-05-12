@@ -1,30 +1,30 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Branch.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
-using Ubiquity.NET.Llvm.Values;
+using LLVMSharp.Interop;
 
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
+using Ubiquity.NET.Llvm.Values;
 
 namespace Ubiquity.NET.Llvm.Instructions
 {
-    /// <summary>Branch instruction</summary>
+    /// <summary>Branch instruction.</summary>
     public class Branch
         : Terminator
     {
-        /// <summary>Gets a value indicating whether this branch is conditional</summary>
-        public bool IsConditional => LLVMIsConditional( ValueHandle );
-
-        /// <summary>Gets the condition for the branch, if any</summary>
-        public Value? Condition
-            => !IsConditional ? null : FromHandle<Value>( LLVMGetCondition( ValueHandle ).ThrowIfInvalid( ) );
-
-        internal Branch( LLVMValueRef valueRef )
-            : base( valueRef )
+        internal Branch(LLVMValueRef valueRef)
+            : base(valueRef)
         {
         }
+
+        /// <summary>Gets a value indicating whether this branch is conditional.</summary>
+        public bool IsConditional => this.ValueHandle.IsConditional;
+
+        /// <summary>Gets the condition for the branch, if any.</summary>
+        public Value? Condition
+            => !this.IsConditional ? default : FromHandle<Value>(this.ValueHandle.Condition);
     }
 }

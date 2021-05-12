@@ -1,10 +1,11 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="ConstantAggregate.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm.Values
 {
@@ -12,8 +13,8 @@ namespace Ubiquity.NET.Llvm.Values
     public class ConstantAggregate
         : Constant
     {
-        internal ConstantAggregate( LLVMValueRef handle )
-            : base( handle )
+        internal ConstantAggregate(LLVMValueRef handle)
+            : base(handle)
         {
         }
     }

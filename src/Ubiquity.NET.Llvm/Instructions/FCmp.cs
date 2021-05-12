@@ -1,20 +1,21 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="FCmp.cs" company="Ubiquity.NET Contributors">
 // Copyright (c) Ubiquity.NET Contributors. All rights reserved.
+// Portions Copyright (c) Microsoft Corporation
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm.Instructions
 {
-    /// <summary>Instruction to perform comparison of floating point values</summary>
+    /// <summary>Instruction to perform comparison of floating point values.</summary>
     /// <seealso href="xref:llvm_langref#fcmp-instruction">LLVM fcmp Instruction</seealso>
     public class FCmp
         : Cmp
     {
-        internal FCmp( LLVMValueRef valueRef )
-            : base( valueRef )
+        internal FCmp(LLVMValueRef valueRef)
+            : base(valueRef)
         {
         }
     }
