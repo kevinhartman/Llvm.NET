@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm
 {
@@ -16,7 +16,9 @@ namespace Ubiquity.NET.Llvm
         /// <returns>String this node wraps</returns>
         public override string ToString( )
         {
-            return NativeMethods.LibLLVMGetMDStringText( MetadataHandle, out uint _ );
+            var context = ContextCache.Single();
+            var asValue = context.ContextHandle.MetadataAsValue(this.MetadataHandle);
+            return asValue.GetMDString();
         }
 
         internal MDString( LLVMMetadataRef handle )

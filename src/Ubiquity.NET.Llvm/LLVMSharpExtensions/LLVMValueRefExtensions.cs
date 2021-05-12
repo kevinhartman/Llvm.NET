@@ -42,5 +42,37 @@ namespace LLVMSharp.Interop
             LLVMValueMetadataEntryRef metadataRef = LLVM.GlobalCopyAllMetadata(self, &count);
             return (metadataRef, (uint)count);
         }
+
+        public static LLVMMetadataRef GetSubprogram(this LLVMValueRef self)
+        {
+            return LLVM.GetSubprogram(self);
+        }
+
+        public static void SetSubprogram(this LLVMValueRef self, LLVMMetadataRef subprogram)
+        {
+            LLVM.SetSubprogram(self, subprogram);
+        }
+
+        public static LLVMMetadataRef ValueAsMetadata(this LLVMValueRef self)
+        {
+            return LLVM.ValueAsMetadata(self);
+        }
+
+        public static LLVMValueRef[] GetMDNodeOperands(this LLVMValueRef self)
+        {
+            var Dest = new LLVMValueRef[self.GetMDNodeNumOperands()];
+
+            fixed (LLVMValueRef* pDest = Dest)
+            {
+                LLVM.GetMDNodeOperands(self, (LLVMOpaqueValue**)pDest);
+            }
+
+            return Dest;
+        }
+
+        public static uint GetMDNodeNumOperands(this LLVMValueRef self)
+        {
+            return LLVM.GetMDNodeNumOperands(self);
+        }
     }
 }

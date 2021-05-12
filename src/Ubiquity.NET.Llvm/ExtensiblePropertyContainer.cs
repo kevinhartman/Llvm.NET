@@ -8,8 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-using Ubiquity.NET.Llvm.Properties;
-
 namespace Ubiquity.NET.Llvm
 {
     /// <summary>Common implementation of <see cref="IExtensiblePropertyContainer"/></summary>
@@ -29,7 +27,7 @@ namespace Ubiquity.NET.Llvm
                 {
                     if( currentValue != null && value != null && currentValue.GetType( ) != value.GetType( ) )
                     {
-                        throw new ArgumentException( Resources.Cannot_change_type_of_an_extended_property_once_set, nameof( value ) );
+                        throw new ArgumentException();
                     }
                 }
 

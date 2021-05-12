@@ -4,9 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm.DebugInfo
 {
@@ -14,9 +12,6 @@ namespace Ubiquity.NET.Llvm.DebugInfo
     public class DINode
         : MDNode
     {
-        /// <summary>Gets the Dwarf tag for the node</summary>
-        public Tag Tag => MetadataHandle == default ? Tag.None : ( Tag )LibLLVMDIDescriptorGetTag( MetadataHandle );
-
         internal DINode( LLVMMetadataRef handle )
             : base( handle )
         {

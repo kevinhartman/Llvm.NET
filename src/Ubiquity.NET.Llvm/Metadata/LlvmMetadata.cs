@@ -8,10 +8,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 
 using Ubiquity.NET.Llvm.DebugInfo;
-using Ubiquity.NET.Llvm.Interop;
-using Ubiquity.NET.Llvm.Properties;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm
 {
@@ -20,94 +17,94 @@ namespace Ubiquity.NET.Llvm
     public enum MetadataKind
     {
         /// <summary>Metadata string</summary>
-        MDString = LibLLVMMetadataKind.LibLLVMMetadataKind_MDString,
+        MDString = LLVMMetadataKind.LLVMMDStringMetadataKind,
 
         /// <summary>Constant Value as metadata</summary>
-        ConstantAsMetadata = LibLLVMMetadataKind.LibLLVMMetadataKind_ConstantAsMetadata,
+        ConstantAsMetadata = LLVMMetadataKind.LLVMConstantAsMetadataMetadataKind,
 
         /// <summary>Local value as metadata</summary>
-        LocalAsMetadata = LibLLVMMetadataKind.LibLLVMMetadataKind_LocalAsMetadata,
+        LocalAsMetadata = LLVMMetadataKind.LLVMLocalAsMetadataMetadataKind,
 
         /// <summary>Distinct metadata place holder</summary>
-        DistinctMDOperandPlaceholder = LibLLVMMetadataKind.LibLLVMMetadataKind_DistinctMDOperandPlaceholder,
+        DistinctMDOperandPlaceholder = LLVMMetadataKind.LLVMDistinctMDOperandPlaceholderMetadataKind,
 
         /// <summary>Metadata tuple</summary>
-        MDTuple = LibLLVMMetadataKind.LibLLVMMetadataKind_MDTuple,
+        MDTuple = LLVMMetadataKind.LLVMMDTupleMetadataKind,
 
         /// <summary>Debug info location</summary>
-        DILocation = LibLLVMMetadataKind.LibLLVMMetadataKind_DILocation,
+        DILocation = LLVMMetadataKind.LLVMDILocationMetadataKind,
 
         /// <summary>Debug info expression</summary>
-        DIExpression = LibLLVMMetadataKind.LibLLVMMetadataKind_DIExpression,
+        DIExpression = LLVMMetadataKind.LLVMDIExpressionMetadataKind,
 
         /// <summary>Debug info global variable expression</summary>
-        DIGlobalVariableExpression = LibLLVMMetadataKind.LibLLVMMetadataKind_DIGlobalVariableExpression,
+        DIGlobalVariableExpression = LLVMMetadataKind.LLVMDIGlobalVariableExpressionMetadataKind,
 
         /// <summary>Generic Debug info node</summary>
-        GenericDINode = LibLLVMMetadataKind.LibLLVMMetadataKind_GenericDINode,
+        GenericDINode = LLVMMetadataKind.LLVMGenericDINodeMetadataKind,
 
         /// <summary>Debug info sub range</summary>
-        DISubrange = LibLLVMMetadataKind.LibLLVMMetadataKind_DISubrange,
+        DISubrange = LLVMMetadataKind.LLVMDISubrangeMetadataKind,
 
         /// <summary>Debug info enumerator</summary>
-        DIEnumerator = LibLLVMMetadataKind.LibLLVMMetadataKind_DIEnumerator,
+        DIEnumerator = LLVMMetadataKind.LLVMDIEnumeratorMetadataKind,
 
         /// <summary>Debug info basic type</summary>
-        DIBasicType = LibLLVMMetadataKind.LibLLVMMetadataKind_DIBasicType,
+        DIBasicType = LLVMMetadataKind.LLVMDIBasicTypeMetadataKind,
 
         /// <summary>Debug info derived type</summary>
-        DIDerivedType = LibLLVMMetadataKind.LibLLVMMetadataKind_DIDerivedType,
+        DIDerivedType = LLVMMetadataKind.LLVMDIDerivedTypeMetadataKind,
 
         /// <summary>Debug info composite type</summary>
-        DICompositeType = LibLLVMMetadataKind.LibLLVMMetadataKind_DICompositeType,
+        DICompositeType = LLVMMetadataKind.LLVMDICompositeTypeMetadataKind,
 
         /// <summary>Debug info subroutine type</summary>
-        DISubroutineType = LibLLVMMetadataKind.LibLLVMMetadataKind_DISubroutineType,
+        DISubroutineType = LLVMMetadataKind.LLVMDISubroutineTypeMetadataKind,
 
         /// <summary>Debug info file reference</summary>
-        DIFile = LibLLVMMetadataKind.LibLLVMMetadataKind_DIFile,
+        DIFile = LLVMMetadataKind.LLVMDIFileMetadataKind,
 
         /// <summary>Debug info Compilation Unit</summary>
-        DICompileUnit = LibLLVMMetadataKind.LibLLVMMetadataKind_DICompileUnit,
+        DICompileUnit = LLVMMetadataKind.LLVMDICompileUnitMetadataKind,
 
         /// <summary>Debug info sub program</summary>
-        DISubprogram = LibLLVMMetadataKind.LibLLVMMetadataKind_DISubprogram,
+        DISubprogram = LLVMMetadataKind.LLVMDISubprogramMetadataKind,
 
         /// <summary>Debug info lexical block</summary>
-        DILexicalBlock = LibLLVMMetadataKind.LibLLVMMetadataKind_DILexicalBlock,
+        DILexicalBlock = LLVMMetadataKind.LLVMDILexicalBlockMetadataKind,
 
         /// <summary>Debug info lexical block file</summary>
-        DILexicalBlockFile = LibLLVMMetadataKind.LibLLVMMetadataKind_DILexicalBlockFile,
+        DILexicalBlockFile = LLVMMetadataKind.LLVMDILexicalBlockFileMetadataKind,
 
         /// <summary>Debug info namespace</summary>
-        DINamespace = LibLLVMMetadataKind.LibLLVMMetadataKind_DINamespace,
+        DINamespace = LLVMMetadataKind.LLVMDINamespaceMetadataKind,
 
         /// <summary>Debug info fro a module</summary>
-        DIModule = LibLLVMMetadataKind.LibLLVMMetadataKind_DIModule,
+        DIModule = LLVMMetadataKind.LLVMDIModuleMetadataKind,
 
         /// <summary>Debug info for a template type parameter</summary>
-        DITemplateTypeParameter = LibLLVMMetadataKind.LibLLVMMetadataKind_DITemplateTypeParameter,
+        DITemplateTypeParameter = LLVMMetadataKind.LLVMDITemplateTypeParameterMetadataKind,
 
         /// <summary>Debug info for a template value parameter</summary>
-        DITemplateValueParameter = LibLLVMMetadataKind.LibLLVMMetadataKind_DITemplateValueParameter,
+        DITemplateValueParameter = LLVMMetadataKind.LLVMDITemplateValueParameterMetadataKind,
 
         /// <summary>Debug info for a global variable</summary>
-        DIGlobalVariable = LibLLVMMetadataKind.LibLLVMMetadataKind_DIGlobalVariable,
+        DIGlobalVariable = LLVMMetadataKind.LLVMDIGlobalVariableMetadataKind,
 
         /// <summary>Debug info for a local variable</summary>
-        DILocalVariable = LibLLVMMetadataKind.LibLLVMMetadataKind_DILocalVariable,
+        DILocalVariable = LLVMMetadataKind.LLVMDILocalVariableMetadataKind,
 
         /// <summary>Debug info for an Objective C style property</summary>
-        DIObjCProperty = LibLLVMMetadataKind.LibLLVMMetadataKind_DIObjCProperty,
+        DIObjCProperty = LLVMMetadataKind.LLVMDIObjCPropertyMetadataKind,
 
         /// <summary>Debug info for an imported entity</summary>
-        DIImportedEntity = LibLLVMMetadataKind.LibLLVMMetadataKind_DIImportedEntity,
+        DIImportedEntity = LLVMMetadataKind.LLVMDIImportedEntityMetadataKind,
 
         /// <summary>Debug info for a macro</summary>
-        DIMacro = LibLLVMMetadataKind.LibLLVMMetadataKind_DIMacro,
+        DIMacro = LLVMMetadataKind.LLVMDIMacroMetadataKind,
 
         /// <summary>Debug info for a macro file</summary>
-        DIMacroFile = LibLLVMMetadataKind.LibLLVMMetadataKind_DIMacroFile,
+        DIMacroFile = LLVMMetadataKind.LLVMDIMacroFileMetadataKind,
     }
 
     /// <summary>Root of the LLVM Metadata hierarchy</summary>
@@ -127,22 +124,29 @@ namespace Ubiquity.NET.Llvm
 
             if( MetadataHandle == default )
             {
-                throw new InvalidOperationException( Resources.Cannot_Replace_all_uses_of_a_null_descriptor );
+                throw new InvalidOperationException( "" );
             }
 
-            LLVMMetadataReplaceAllUsesWith( MetadataHandle, other.MetadataHandle );
+            MetadataHandle.ReplaceAllUsesWith( other.MetadataHandle );
             MetadataHandle = default;
         }
 
         /// <summary>Formats the metadata as a string</summary>
         /// <returns>Metadata as a string</returns>
-        public override string ToString( )
+        public override string ToString()
         {
-            return MetadataHandle == default ? string.Empty : LibLLVMMetadataAsString( MetadataHandle );
+            if (this.MetadataHandle == default)
+            {
+                return string.Empty;
+            }
+
+            var context = ContextCache.Single();
+            var asValue = context.ContextHandle.MetadataAsValue(this.MetadataHandle);
+            return asValue.PrintToString();
         }
 
         /// <summary>Gets a value indicating this metadata's kind</summary>
-        public MetadataKind Kind => ( MetadataKind )LibLLVMGetMetadataID( MetadataHandle );
+        public MetadataKind Kind => ( MetadataKind )this.MetadataHandle.GetMetadataKind();
 
         internal LLVMMetadataRef MetadataHandle { get; /*protected*/ set; }
 
@@ -165,7 +169,7 @@ namespace Ubiquity.NET.Llvm
             {
                 // use the native kind value to determine the managed type
                 // that should wrap this particular handle
-                var kind = ( MetadataKind )LibLLVMGetMetadataID( handle );
+                var kind = ( MetadataKind ) handle.GetMetadataKind();
                 switch( kind )
                 {
                 case MetadataKind.MDString:

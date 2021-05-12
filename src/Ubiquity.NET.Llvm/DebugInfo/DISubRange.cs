@@ -6,10 +6,8 @@
 
 using System;
 
-using Ubiquity.NET.Llvm.Interop;
+using LLVMSharp.Interop;
 using Ubiquity.NET.Llvm.Values;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
 
 namespace Ubiquity.NET.Llvm.DebugInfo
 {
@@ -18,9 +16,6 @@ namespace Ubiquity.NET.Llvm.DebugInfo
     public class DISubRange
         : DINode
     {
-        /// <summary>Gets a value for the lower bound of the range</summary>
-        public Int64 LowerBound => LibLLVMDISubRangeGetLowerBounds( MetadataHandle );
-
         /// <summary>Gets a, potentially null, constant value for the count of the subrange</summary>
         /// <remarks>
         /// Count (length) of a DISubrange is either a <see cref="ConstantInt"/>
@@ -28,8 +23,9 @@ namespace Ubiquity.NET.Llvm.DebugInfo
         /// extracts the count as a constant integral value (if present). If this is <see langword="null"/>
         /// then <see cref="VariableCount"/> is not. (and vice versa)
         /// </remarks>
-        public long? ConstantCount
-            => (Operands[ 0 ] is ConstantAsMetadata constMetadata) ? ((ConstantInt)constMetadata!).SignExtendedValue : (long?)null;
+        public long? ConstantCount => (this.Operands[0] is ConstantAsMetadata)
+            ? ((ConstantInt)this.Operands.GetOperandValue(0)!).SignExtendedValue
+            : (long?)null;
 
         /// <summary>Gets a, potentially null, <see cref="DIVariable"/> for the count of the subrange</summary>
         /// <remarks>

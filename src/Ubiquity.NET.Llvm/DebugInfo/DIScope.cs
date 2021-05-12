@@ -4,9 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm.DebugInfo
 {
@@ -25,7 +23,8 @@ namespace Ubiquity.NET.Llvm.DebugInfo
                     return null;
                 }
 
-                return this is DIFile file ? file : FromHandle<DIFile>( LLVMDIScopeGetFile( MetadataHandle ) );
+                
+                return this is DIFile file ? file : FromHandle<DIFile>(this.MetadataHandle.DIScopeGetFile());
             }
         }
 

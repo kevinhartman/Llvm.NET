@@ -4,9 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
+using LLVMSharp.Interop;
 
 namespace Ubiquity.NET.Llvm.DebugInfo
 {
@@ -16,9 +14,6 @@ namespace Ubiquity.NET.Llvm.DebugInfo
     public class DIBasicType
         : DIType
     {
-        /// <summary>Gets the encoding for the type</summary>
-        public DiTypeKind Encoding => ( DiTypeKind )LibLLVMDIBasicTypeGetEncoding( MetadataHandle );
-
         /// <summary>Initializes a new instance of the <see cref="DIBasicType"/> class.</summary>
         /// <param name="handle"><see cref="LLVMMetadataRef"/> for a  DIBasicType to wrap</param>
         internal DIBasicType( LLVMMetadataRef handle )

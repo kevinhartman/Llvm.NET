@@ -9,8 +9,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-using Ubiquity.NET.Llvm.Properties;
-
 namespace Ubiquity.NET.Llvm
 {
     /// <summary>Wrapper class to provide Write-Once semantics to a value</summary>
@@ -39,7 +37,7 @@ namespace Ubiquity.NET.Llvm
             {
                 if( !HasValue )
                 {
-                    throw new InvalidOperationException( Resources.Value_not_set );
+                    throw new InvalidOperationException();
                 }
 
                 return ActualValue;
@@ -49,7 +47,7 @@ namespace Ubiquity.NET.Llvm
             {
                 if( HasValue )
                 {
-                    throw new InvalidOperationException( Resources.Value_already_set );
+                    throw new InvalidOperationException();
                 }
 
                 ActualValue = value;

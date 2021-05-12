@@ -6,8 +6,6 @@
 
 using System;
 
-using Ubiquity.ArgValidators;
-using Ubiquity.NET.Llvm.Properties;
 using Ubiquity.NET.Llvm.Types;
 
 namespace Ubiquity.NET.Llvm.DebugInfo
@@ -34,7 +32,7 @@ namespace Ubiquity.NET.Llvm.DebugInfo
         /// <param name="encoding">Encoding for the type</param>
         public DebugBasicType( ITypeRef llvmType, BitcodeModule module, string name, DiTypeKind encoding )
             : base( llvmType,
-                    module.ValidateNotNull( nameof( module ) )
+                    module
                           .DIBuilder
                           .CreateBasicType( name
                                           , module.Layout.BitSizeOf( llvmType )
@@ -42,11 +40,9 @@ namespace Ubiquity.NET.Llvm.DebugInfo
                                           )
                   )
         {
-            name.ValidateNotNullOrWhiteSpace( nameof( name ) );
-
             if( module.Layout == null )
             {
-                throw new ArgumentException( Resources.Module_needs_Layout_to_build_basic_types, nameof( module ) );
+                throw new ArgumentException( "" );
             }
 
             switch( llvmType.Kind )
@@ -62,7 +58,7 @@ namespace Ubiquity.NET.Llvm.DebugInfo
                 break;
 
             default:
-                throw new ArgumentException( Resources.Expected_a_primitive_type, nameof( llvmType ) );
+                throw new ArgumentException( "" );
             }
         }
     }

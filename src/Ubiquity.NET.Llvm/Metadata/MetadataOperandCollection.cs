@@ -8,10 +8,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
-using Ubiquity.ArgValidators;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
+using LLVMSharp.Interop;
+using Ubiquity.NET.Llvm.Values;
 
 namespace Ubiquity.NET.Llvm
 {
@@ -28,15 +26,17 @@ namespace Ubiquity.NET.Llvm
         public LlvmMetadata? this[ int index ]
         {
             get => GetOperand<LlvmMetadata>( index );
-            set
-            {
-                index.ValidateRange( 0, Count - 1, nameof( index ) );
-                LibLLVMMDNodeReplaceOperand( Container.MetadataHandle, ( uint )index, value?.MetadataHandle ?? default );
-            }
         }
 
         /// <summary>Gets the count of operands in this collection</summary>
-        public int Count => checked(( int )LibLLVMMDNodeGetNumOperands( Container.MetadataHandle ));
+        public int Count
+        {
+            get
+            {
+                var valueHandle = this.Container.Context.ContextHandle.MetadataAsValue(Container.MetadataHandle);
+                return checked((int)valueHandle.GetMDNodeNumOperands());
+            }
+        }
 
         /// <summary>Gets an enumerator for the operands in this collection</summary>
         /// <returns>Enumerator of operands</returns>
@@ -65,10 +65,29 @@ namespace Ubiquity.NET.Llvm
         public TItem? GetOperand<TItem>( Index i )
             where TItem : LlvmMetadata
         {
-            uint offset = ( uint )i.GetOffset(Count);
-            offset.ValidateRange( 0u, ( uint )Count, nameof( i ) );
-            var node = LibLLVMGetOperandNode( LibLLVMMDNodeGetOperand( Container.MetadataHandle, offset ) );
-            return LlvmMetadata.FromHandle<TItem>( Container.Context, node );
+            var operand = this.GetOperandValue(i);
+            if (operand == null)
+            {
+                return null;
+            }
+
+            var node = operand.ValueHandle.ValueAsMetadata();
+            return LlvmMetadata.FromHandle<TItem>( this.Container.Context, node );
+        }
+
+        public Value? GetOperandValue(Index i)
+        {
+            var offset = i.GetOffset(this.Count);
+
+            var valueHandle = this.Container.Context.ContextHandle.MetadataAsValue(this.Container.MetadataHandle);
+            var operand = valueHandle.GetMDNodeOperands().ElementAt(offset);
+            if (operand == default)
+            {
+                // Requested operand doesn't exist.
+                return null;
+            }
+
+            return Value.FromHandle(operand);
         }
 
         internal MetadataOperandCollection( MDNode container )

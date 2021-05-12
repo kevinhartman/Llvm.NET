@@ -6,12 +6,10 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
-using Ubiquity.ArgValidators;
-using Ubiquity.NET.Llvm.Interop;
-using Ubiquity.NET.Llvm.Properties;
-
-using static Ubiquity.NET.Llvm.Interop.NativeMethods;
+using LLVMSharp.Interop;
+using Ubiquity.NET.Llvm.Values;
 
 namespace Ubiquity.NET.Llvm
 {
@@ -34,32 +32,12 @@ namespace Ubiquity.NET.Llvm
             get
             {
                 ThrowIfDeleted( );
-                return GetMeatadataContext( MetadataHandle );
+                return GetMetadataContext( MetadataHandle );
             }
         }
 
         /// <summary>Gets a value indicating whether this node was deleted</summary>
         public bool IsDeleted => MetadataHandle == default;
-
-        /// <summary>Gets a value indicating whether this node is a temporary</summary>
-        public bool IsTemporary => LibLLVMIsTemporary( MetadataHandle );
-
-        /// <summary>Gets a value indicating whether this node is resolved</summary>
-        /// <remarks>
-        /// <para>If <see cref="IsTemporary"/> is <see langword="true"/>, then this always
-        /// returns <see langword="false"/>; if <see cref="IsDistinct"/> is <see langword="true"/>,
-        /// this always returns <see langword="true"/>.</para>
-        ///
-        /// <para>If <see cref="IsUniqued"/> is <see langword="true"/> then this returns <see langword="true"/>
-        /// if this node has already dropped RAUW support (because all operands are resolved).</para>
-        /// </remarks>
-        public bool IsResolved => LibLLVMIsResolved( MetadataHandle );
-
-        /// <summary>Gets a value indicating whether this node is uniqued</summary>
-        public bool IsUniqued => LibLLVMIsUniqued( MetadataHandle );
-
-        /// <summary>Gets a value indicating whether this node is distinct</summary>
-        public bool IsDistinct => LibLLVMIsDistinct( MetadataHandle );
 
         /// <summary>Gets the operands for this node, if any</summary>
         public MetadataOperandCollection Operands { get; }
@@ -68,21 +46,14 @@ namespace Ubiquity.NET.Llvm
         /// <param name="other">Node to replace this one with</param>
         public override void ReplaceAllUsesWith( LlvmMetadata other )
         {
-            other.ValidateNotNull( nameof( other ) );
-
-            if( !IsTemporary || IsResolved )
-            {
-                throw new InvalidOperationException( Resources.Cannot_replace_non_temporary_or_resolved_MDNode );
-            }
-
             if( MetadataHandle == default )
             {
-                throw new InvalidOperationException( Resources.Cannot_Replace_all_uses_of_a_null_descriptor );
+                throw new InvalidOperationException( "" );
             }
 
             // grab the context before replacement as replace deletes and invalidates the node
             var context = Context;
-            LLVMMetadataReplaceAllUsesWith( MetadataHandle, other.MetadataHandle );
+            this.MetadataHandle.ReplaceAllUsesWith(other.MetadataHandle);
 
             // remove current node mapping from the context.
             // It won't be valid for use after clearing the handle
@@ -99,7 +70,12 @@ namespace Ubiquity.NET.Llvm
         public T? GetOperand<T>( int index )
             where T : LlvmMetadata
         {
-            return Operands.GetOperand<T>( index );
+            return this.Operands.GetOperand<T>( index );
+        }
+
+        public Value? GetOperandValue( int index )
+        {
+            return this.Operands.GetOperandValue(index);
         }
 
         /// <summary>Gets a string operand by index</summary>
@@ -138,7 +114,7 @@ namespace Ubiquity.NET.Llvm
         internal static T? FromHandle<T>( LLVMMetadataRef handle )
             where T : MDNode
         {
-            return handle == default ? null : FromHandle<T>( GetMeatadataContext( handle ), handle );
+            return handle == default ? null : FromHandle<T>( GetMetadataContext( handle ), handle );
         }
 
         private void ThrowIfDeleted( )
@@ -149,10 +125,11 @@ namespace Ubiquity.NET.Llvm
             }
         }
 
-        private static Context GetMeatadataContext( LLVMMetadataRef metadataHandle )
+        private static Context GetMetadataContext( LLVMMetadataRef metadataHandle )
         {
-            var hContext = LibLLVMGetNodeContext( metadataHandle ).ThrowIfInvalid()!;
-            return ContextCache.GetContextFor( hContext );
+            // TODO: we currently expect exactly one context. Instead, this method
+            // should find a context that owns metadataHandle and return that.
+            return ContextCache.Single();
         }
     }
 }

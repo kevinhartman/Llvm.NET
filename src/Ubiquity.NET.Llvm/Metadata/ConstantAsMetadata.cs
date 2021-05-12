@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
+using LLVMSharp.Interop;
 using Ubiquity.NET.Llvm.Values;
 
 namespace Ubiquity.NET.Llvm
@@ -13,9 +13,6 @@ namespace Ubiquity.NET.Llvm
     public class ConstantAsMetadata
         : ValueAsMetadata
     {
-        /// <summary>Gets the <see cref="Constant"/> this node wraps</summary>
-        public Constant Constant => ( Value as Constant )!;
-
         internal ConstantAsMetadata( LLVMMetadataRef handle )
             : base( handle )
         {

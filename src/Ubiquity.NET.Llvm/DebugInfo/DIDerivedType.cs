@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Ubiquity.NET.Llvm.Interop;
+using LLVMSharp.Interop;
 using Ubiquity.NET.Llvm.Values;
 
 namespace Ubiquity.NET.Llvm.DebugInfo
@@ -27,8 +27,8 @@ namespace Ubiquity.NET.Llvm.DebugInfo
         /// <summary>Gets the extra data, if any, attached to this derived type</summary>
         public LlvmMetadata? ExtraData => Operands[ 4 ];
 
-        /// <summary>Gets the Class type extra data for a pointer to member type, if any</summary>
-        public DIType? ClassType => Tag != Tag.PointerToMemberType ? null : GetOperand<DIType>( 4 );
+        /// <summary>Gets the Class type extra data for a pointer to member type</summary>
+        public DIType? ClassType => GetOperand<DIType>( 4 );
 
         /// <summary>Gets the ObjCProperty extra data</summary>
         public DIObjCProperty? ObjCProperty => GetOperand<DIObjCProperty>( 4 );
@@ -38,14 +38,14 @@ namespace Ubiquity.NET.Llvm.DebugInfo
         /// if <see cref="DebugInfoFlags.BitField"/> is not set in <see cref="DebugInfoFlags"/>
         /// </remarks>
         public Constant? StorageOffsetInBits
-            => Tag == Tag.Member && DebugInfoFlags.HasFlag( DebugInfoFlags.BitField )
-                    ? GetOperand<ConstantAsMetadata>( 4 )?.Value as Constant
+            => DebugInfoFlags.HasFlag( DebugInfoFlags.BitField )
+                    ? this.GetOperandValue( 4 ) as Constant
                     : null;
 
         /// <summary>Gets the constant for a static member</summary>
         public Constant? Constant
-            => Tag == Tag.Member && DebugInfoFlags.HasFlag( DebugInfoFlags.StaticMember )
-                    ? GetOperand<ConstantAsMetadata>( 4 )?.Value as Constant
+            => DebugInfoFlags.HasFlag( DebugInfoFlags.StaticMember )
+                    ? this.GetOperandValue( 4 ) as Constant
                     : null;
 
         /// <summary>Initializes a new instance of the <see cref="DIDerivedType"/> class from an <see cref="LLVMMetadataRef"/></summary>
