@@ -61,7 +61,6 @@ namespace Ubiquity.NET.Llvm
         /// <returns>Item at the specified index</returns>
         /// <exception cref="ArgumentOutOfRangeException">index is out of range for the collection</exception>
         /// <exception cref="InvalidCastException">If the element at the index is not castable to <typeparamref name="TItem"/></exception>
-        /// <remarks>This provides a common (and likely internally optimized) means of getting an element as a specific type</remarks>
         public TItem? GetOperand<TItem>( Index i )
             where TItem : LlvmMetadata
         {
@@ -75,15 +74,25 @@ namespace Ubiquity.NET.Llvm
             return LlvmMetadata.FromHandle<TItem>( this.Container.Context, node );
         }
 
+        /// <summary>Indexer to get the element as a <see cref="Value"/>.</summary>
+        /// <param name="i">index for the item</param>
+        /// <returns>Item at the specified index</returns>
+        /// <exception cref="ArgumentOutOfRangeException">index is out of range for the collection</exception>
         public Value? GetOperandValue(Index i)
         {
             var offset = i.GetOffset(this.Count);
-
             var valueHandle = this.Container.Context.ContextHandle.MetadataAsValue(this.Container.MetadataHandle);
-            var operand = valueHandle.GetMDNodeOperands().ElementAt(offset);
+            var operands = valueHandle.GetMDNodeOperands();
+
+            if (offset >= operands.Length)
+            {
+                throw new ArgumentOutOfRangeException($"No operand exists at offset {offset}.");
+            }
+
+            var operand = operands[offset];
             if (operand == default)
             {
-                // Requested operand doesn't exist.
+                // Requested operand is nullptr.
                 return null;
             }
 
